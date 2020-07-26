@@ -15,7 +15,7 @@ const long kSerialSpeed = 115200;
 const uint8_t kWifiResetPin = 23;
 
 // The base URL for server requests.
-const String kBaseUrl = "https://accent.ink";
+const String kBaseUrl = "https://jongejan-accent.uc.r.appspot.com";
 
 // The URL for the next wake time endpoint.
 const String kNextEndpoint = kBaseUrl + "/next";
