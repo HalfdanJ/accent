@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Preferences.h>
 #include "Display.h"
 #include "DisplayHD.h"
 #include "Network.h"
@@ -60,11 +61,9 @@ void setup() {
   }
 
   // Show the latest image.
-  display.Initialize();
-  if (!downloadImage(display.Width(), display.Height())) {
+  if (!downloadAndDisplayImage(display.Width(), display.Height())) {
     return;
   }
-  display.Update();
 
   // Go to sleep until the next refresh.
   scheduleSleep();
@@ -83,7 +82,7 @@ void loop() {
 }
 
 // Streams the image from the server and sends it to the display in chunks.
-bool downloadImage(int16_t width, int16_t height) {
+bool downloadAndDisplayImage(int16_t width, int16_t height) {
   Serial.println("Downloading image");
   HTTPClient http;
 
@@ -97,6 +96,23 @@ bool downloadImage(int16_t width, int16_t height) {
 
   // Start reading from the stream.
   char buffer[kStreamBufferSize];
+  Preferences preferences;
+  preferences.begin("download", false);
+
+  String header_checksum = http.header("content-md5");
+  String last_checksum = preferences.getString("checksum", "");
+
+  preferences.putString("checksum", header_checksum);
+  preferences.end();
+
+  if(header_checksum.equals(last_checksum)) {
+    // Checksum has not changed, skip drawing
+    Serial.println("Checksum not changed. Skipping drawing");
+    return true;
+  }
+
+  display.Initialize();
+
   WiFiClient* stream = http.getStreamPtr();
   unsigned long total_count = 0;
   do {
@@ -119,6 +135,10 @@ bool downloadImage(int16_t width, int16_t height) {
 
   Serial.println("Download complete");
   http.end();
+  
+  
+  display.Update();
+
   return true;
 }
 
