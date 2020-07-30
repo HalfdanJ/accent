@@ -28,39 +28,12 @@ API_VERSION = 'v3'
 # The ID of the calendar to show.
 CALENDAR_ID = 'primary'
 
-# # The number of days in a week.
-# DAYS_IN_WEEK = 7
-
-# # The maximum nubmer of (partial) weeks in a month.
-# WEEKS_IN_MONTH = 6
-
 # The color of the image background.
 BACKGROUND_COLOR = (255, 255, 255)
-
-# # The color used for days.
-# NUMBER_COLOR = (0, 0, 0)
 
 # The color used for the current day and events.
 BLACK_COLOR = (0, 0, 0)
 RED_COLOR = (255, 0, 0)
-
-# # The squircle image file.
-# SQUIRCLE_FILE = 'assets/squircle.gif'
-
-# # The dot image file.
-# DOT_FILE = 'assets/dot.gif'
-
-# # The offset used to vertically center the numbers in the squircle.
-# NUMBER_Y_OFFSET = 1
-
-# # The horizontal margin between dots.
-# DOT_MARGIN = 4
-
-# # The vertical offset between dots and numbers.
-# DOT_OFFSET = 16
-
-# # The color used to highlight the current day and events.
-# HIGHLIGHT_COLOR = (255, 0, 0)
 
 LEFT_MARGIN = 60
 
@@ -190,11 +163,12 @@ class GoogleCalendarMeetings(ImageContent):
             else:
                 num_char_per_line = available_width / (sum(character_widths) / len(character_widths))
                 textlines = textwrap.wrap(text, width=num_char_per_line)
-                warning(num_char_per_line)
 
 
-            for line in textlines:
-                warning(line)
+            for i, line in enumerate(textlines[:3]):
+                if i == 2 and len(textlines) > 3:
+                    line += "..."
+                    
                 draw_text(line, CAL_FONT, BLACK_COLOR,
                                 xy=(LEFT_MARGIN + 180, y), image=image, align='left')
                 y += CAL_FONT['height']
