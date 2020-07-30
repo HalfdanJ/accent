@@ -23,6 +23,7 @@ from firestore import Firestore
 from firestore import GoogleCalendarStorage
 from geocoder import Geocoder
 from google_calendar import GoogleCalendar
+from google_calendar_meetings import GoogleCalendarMeetings
 from response import content_response
 from response import epd_response
 from response import gif_response
@@ -52,6 +53,7 @@ geocoder = Geocoder()
 # Helper library instances.
 artwork = Artwork()
 calendar = GoogleCalendar(geocoder)
+meetings = GoogleCalendarMeetings(geocoder)
 city = City(geocoder)
 commute = Commute(geocoder)
 everyone = Everyone(geocoder)
@@ -90,6 +92,14 @@ def calendar_gif(key=None, user=None, size=None):
     """Responds with a GIF version of the calendar image."""
 
     return content_response(calendar, gif_response, user, size)
+
+
+@app.route('/meetings')
+@user_auth(image_response=gif_response)
+def meetings_gif(key=None, user=None, size=None):
+    """Responds with a GIF version of the calendar image."""
+
+    return content_response(meetings, gif_response, user, size)
 
 
 @app.route('/everyone')

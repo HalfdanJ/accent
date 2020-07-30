@@ -6,6 +6,7 @@ from logging import info
 
 from artwork import Artwork
 from google_calendar import GoogleCalendar
+from google_calendar_meetings import GoogleCalendarMeetings
 from city import City
 from commute import Commute
 from content import ContentError
@@ -17,7 +18,7 @@ from sun import Sun
 
 # The client sleep duration may be early by a few minutes, so we add a buffer
 # to avoid waking up twice in a row.
-DELAY_BUFFER_S = 15 * 60
+DELAY_BUFFER_S = 1 * 60
 
 
 class Schedule(ImageContent):
@@ -41,6 +42,7 @@ class Schedule(ImageContent):
         self._city = City(geocoder)
         self._commute = Commute(geocoder)
         self._calendar = GoogleCalendar(geocoder)
+        self._meetings = GoogleCalendarMeetings(geocoder)
         self._everyone = Everyone(geocoder)
 
     def _next(self, cron, after, user):
@@ -67,6 +69,8 @@ class Schedule(ImageContent):
             content = self._commute
         elif kind == 'calendar':
             content = self._calendar
+        elif kind == 'meetings':
+            content = self._meetings
         elif kind == 'everyone':
             content = self._everyone
         else:

@@ -24,17 +24,10 @@ SCREENSTAR_SMALL_REGULAR = {
     }
 }
 
+def calculate_character_widths(text, font_spec, draw):
+    """ Measure the width of each character. """
+    font = ImageFont.truetype(font_spec['file'], size=font_spec['size'])
 
-def draw_text(text, font_spec, text_color, xy=None, anchor=None,
-              box_color=None, box_padding=0, border_color=None, border_width=0,
-              image=None):
-    """Draws centered text on an image, optionally in a box."""
-
-    draw = Draw(image)
-    text_size = font_spec['size']
-    font = ImageFont.truetype(font_spec['file'], size=text_size)
-
-    # Measure the width of each character.
     character_widths = []
     for character in text:
         # Override the measured width, if specified.
@@ -44,13 +37,31 @@ def draw_text(text, font_spec, text_color, xy=None, anchor=None,
         else:
             character_width, _ = draw.textsize(character, font)
         character_widths.append(character_width)
+    return character_widths
+
+
+def draw_text(text, font_spec, text_color, xy=None, anchor=None,
+              box_color=None, box_padding=0, border_color=None, border_width=0,
+              image=None, align="center"):
+    """Draws centered text on an image, optionally in a box."""
+
+    draw = Draw(image)
+    text_size = font_spec['size']
+    font = ImageFont.truetype(font_spec['file'], size=text_size)
+
+    character_widths = calculate_character_widths(text, font_spec, draw)
     text_width = sum(character_widths)
 
     # If any xy is specified, use it.
     text_height = font_spec['height']
     if xy:
-        x = xy[0] - text_width // 2
+        x = xy[0]
         y = xy[1] - text_height // 2
+        if align == 'center':
+            x -= text_width // 2
+        elif align == 'right':
+            x -= text_width
+
 
     # If any anchor is specified, adjust the xy.
     if anchor == 'center':

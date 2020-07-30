@@ -11,22 +11,38 @@ from content import ImageContent
 IMAGES_DIR = 'assets/artwork'
 
 # The file extension of all artwork image files.
-IMAGE_EXTENSION = 'gif'
+IMAGE_EXTENSION = '(gif|png|jpg)'
 
 
 class Artwork(ImageContent):
     """A collection of randomly selected image artwork."""
 
+    def _customConvert(self, silf, palette, dither=False):
+        ''' Convert an RGB or L mode image to use a given P image's palette.
+            PIL.Image.quantize() forces dither = 1. 
+            This custom quantize function will force it to 0.
+            https://stackoverflow.com/questions/29433243/convert-image-to-specific-palette-using-pil-without-dithering
+        '''
+
+        silf.load()
+
+        # use palette from reference image made below
+        palette.load()
+        im = silf.im.convert("P", 0, palette.im)
+        # the 0 above means turn OFF dithering making solid colors
+        return silf._new(im)
+
     def image(self, _, size):
         """Generates an artwork image."""
 
         # Load a random image.
-        paths = glob(path_join(IMAGES_DIR, '*.%s' % IMAGE_EXTENSION))
+        paths = glob(path_join(IMAGES_DIR, '*.*' ))
         filename = choice(paths)
         info('Using artwork file: %s' % filename)
         image = Image.open(filename)
+       
         image = image.convert('RGB')
-
+       
         diff_width = size[0] - image.width
         diff_height = size[1] - image.height
 
